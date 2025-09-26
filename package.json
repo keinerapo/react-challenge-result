@@ -1,0 +1,33 @@
+{
+  "name": "react-challenge-master",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "pnpm build:css && pnpm build:js",
+    "build:css": "postcss src/styles.css --output dist/styles.css",
+    "build:js": "esbuild src/index.tsx --bundle --outfile=dist/index.js --format=esm --jsx=automatic --conditions=style",
+    "dev": "concurrently \"pnpm build:css --watch\" \"pnpm build:js --watch --servedir=. --conditions=style\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.17.1",
+  "dependencies": {
+    "@r2wc/react-to-web-component": "^2.1.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.13",
+    "@types/react": "^19.1.13",
+    "@types/react-dom": "^19.1.9",
+    "autoprefixer": "^10.4.21",
+    "concurrently": "^9.2.1",
+    "esbuild": "^0.25.10",
+    "postcss-cli": "^11.0.1",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.9.2"
+  }
+}
