@@ -4,10 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "pnpm build:css && pnpm build:js",
-    "build:css": "postcss src/styles.css --output dist/styles.css",
-    "build:js": "esbuild src/index.tsx --bundle --outfile=dist/index.js --format=esm --jsx=automatic --conditions=style",
-    "dev": "concurrently \"pnpm build:css --watch\" \"pnpm build:js --watch --servedir=. --conditions=style\"",
+    "typecheck": "tsc --noEmit",
+    "build:css": "postcss src/styles.css --output src/generated/tw.css",
+    "build:components": "esbuild src/custom-elements/index.ts --bundle --format=iife --outfile=dist/my-form.js --minify --jsx=automatic --loader:.css=text",
+    "build": "pnpm build:css && pnpm build:components && pnpm typecheck",
+    "watch:tailwind": "postcss src/styles.css --output src/generated/tw.css --watch",
+    "watch:components": "esbuild src/custom-elements/index.ts --bundle --format=iife --outfile=dist/my-form.js --jsx=automatic --watch --servedir=. --loader:.css=text",
+    "dev": "concurrently -n CSS,JS \"pnpm watch:tailwind\" \"pnpm watch:components\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -15,7 +18,6 @@
   "license": "ISC",
   "packageManager": "pnpm@10.17.1",
   "dependencies": {
-    "@r2wc/react-to-web-component": "^2.1.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
   },

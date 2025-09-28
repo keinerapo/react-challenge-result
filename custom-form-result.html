@@ -6,11 +6,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>React Form - Web Component</title>
     <!-- NOTE:: Add your script here -->
-    <script src=""></script>
+     <script src="./dist/my-form.js"></script>
   </head>
   <body>
+    <rc-form-step id="form" title="Accommodation">
+      <rc-text-field 
+        name="name" 
+        label="Name" 
+        placeholder="Enter accommodation name"
+        required="true"
+        min-length="4" 
+        max-length="128"
+        no-numbers="true">
+      </rc-text-field>
+
+      <rc-text-field
+        name="address"
+        label="Address"
+        placeholder="Enter full address"
+        required="true"
+        min-length="4"
+        max-length="128">
+      </rc-text-field>
+
+      <rc-text-area
+        name="description"
+        label="Description"
+        placeholder="Enter detailed description (optional)"
+        min-length="128"
+        max-length="2048">
+      </rc-text-area>
+
+      <rc-select-list
+        name="type"
+        label="Type"
+        required="true"
+        options='["apartment","villa","house"]'>
+      </rc-select-list>
+
+      <rc-photo-uploader
+        name="photos"
+        label="Photos">
+      </rc-photo-uploader>
+
+      <rc-input-submit label="Next"></rc-input-submit>
+    </rc-form-step>
     <script>
       /* NOTE:: You can modify this script if you need to */
+      document.getElementById("form").addEventListener("wc-submit", (e) => {
+        console.log("Datos enviados:", e.detail)
+      })
       const form = document.createElement('custom-react-form');
       form.addEventListener('custom-react-submit', (data) => console.log(data));
 
