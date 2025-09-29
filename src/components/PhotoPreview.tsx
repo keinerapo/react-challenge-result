@@ -7,21 +7,25 @@ interface PhotoPreviewProps {
 }
 
 const PhotoPreview: React.FC<PhotoPreviewProps> = ({ src, alt, className = '' }) => {
-  const baseClasses = 'bg-red-200 rounded-lg overflow-hidden'
+  const baseClasses = 'w-24 h-24 border border-gray-500 [border-style:solid] rounded-md flex items-center justify-center'
   const combinedClasses = `${baseClasses} ${className}`.trim()
 
   return (
     <div className={combinedClasses}>
-      <img 
-        src={src} 
-        alt={alt}
-        className="w-full h-24 object-cover"
-        onError={(e) => {
-          const target = e.target as HTMLImageElement
-          target.style.display = 'none'
-          target.parentElement!.className = target.parentElement!.className.replace('bg-red-200', 'bg-green-200')
-        }}
-      />
+         {src ? (
+            <img 
+                src={src} 
+                alt={alt}
+                className="w-full h-24 object-cover"
+                onError={(e) => {
+                const target = e.target as HTMLImageElement
+                target.style.display = 'none'
+                target.parentElement!.className = target.parentElement!.className.replace('bg-red-200', 'bg-green-200')
+                }}
+            />
+          ) : (
+            <span className="text-xs text-gray-500">{alt}</span>
+          )}
     </div>
   )
 }

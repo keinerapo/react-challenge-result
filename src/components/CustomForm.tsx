@@ -7,14 +7,18 @@ import SelectList from './SelectList'
 import PhotoUploader, { PhotoUploaderRef } from './PhotoUploader'
 import InputSubmit from './InputSubmit'
 import TextContent from './TextContent'
-import PhotoPreview from './PhotoPreview'
 import PhotoPreviewGrid from './PhotoPreviewGrid'
+import Toast from './Toast'
+import { useToast } from '../hooks/useToast'
+import { useFormSubmission } from '../utils/mockSubmit'
 
 
 const CustomForm: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(1)
   const [step1Data, setStep1Data] = useState<Step1Data | null>(null)
   const [step2Data, setStep2Data] = useState<Step2Data | null>(null)
+  const { toast, showSuccess, showError, hideToast } = useToast()
+  const { isSubmitting, submitForm } = useFormSubmission()
 
   const {
     control: step1Control,
@@ -22,11 +26,11 @@ const CustomForm: React.FC = () => {
     formState: { errors: step1Errors, isValid: step1IsValid }
   } = useForm<Step1Data>({
     resolver: zodResolver(step1Schema),
-    mode: 'onChange',
+    mode: 'onBlur',
     defaultValues: {
-      name: '',
-      address: '',
-      description: '',  
+      name: undefined,
+      address: undefined,
+      description: undefined,  
       type: undefined,
       photos: []
     }
@@ -38,11 +42,11 @@ const CustomForm: React.FC = () => {
     formState: { errors: step2Errors, isValid: step2IsValid }
   } = useForm<Step2Data>({
     resolver: zodResolver(step2Schema),
-    mode: 'onChange',
+    mode: 'onBlur',
     defaultValues: {
-      name: '',
-      email: '',
-      phone: ''
+      name: undefined,
+      email: undefined,
+      phone: undefined
     }
   })
 
@@ -56,12 +60,19 @@ const CustomForm: React.FC = () => {
     setCurrentStep(3)
   }
 
-  const handleFinalSubmit = () => {
-    if (step1Data && step2Data) {
-      console.log('Final Submission Data:', {
-        step1: step1Data,
-        step2: step2Data,
-      })
+  const handleFinalSubmit = async () => {
+    if (!step1Data || !step2Data) return
+
+    try {
+      const result = await submitForm()
+      
+      if (result.success) {
+        showSuccess(result.message)
+      } else {
+        showError(result.message)
+      }
+    } catch (error) {
+      showError('An unexpected error occurred. Please try again.')
     }
   }
 
@@ -229,25 +240,42 @@ const CustomForm: React.FC = () => {
       <div className="bg-gray-50 p-6 rounded-lg">
         <h2 className="text-xl font-bold mb-4">Owner</h2>
         <TextContent
-          label="Email Address"
+          label="Name"
+          value={step2Data?.name || ''}
+        />
+        <TextContent
+          label="Email"
           value={step2Data?.email || ''}
+        />
+        <TextContent
+          label="Phone"
+          value={step2Data?.phone || ''}
         />
       </div>
 
       <InputSubmit
-        label="Submit"
-        isFormValid={true}
+        label={isSubmitting ? "Submitting..." : "Submit"}
+        isFormValid={!isSubmitting}
         onClick={handleFinalSubmit}
       />
     </div>
   )
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
-      {currentStep === 1 && renderStep1()}
-      {currentStep === 2 && renderStep2()}
-      {currentStep === 3 && renderStep3()}
-    </div>
+    <>
+      <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+        {currentStep === 1 && renderStep1()}
+        {currentStep === 2 && renderStep2()}
+        {currentStep === 3 && renderStep3()}
+      </div>
+
+      <Toast
+        type={toast.type}
+        message={toast.message}
+        isVisible={toast.isVisible}
+        onClose={hideToast}
+      />
+    </>
   )
 }
 

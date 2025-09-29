@@ -10,24 +10,24 @@ interface PhotoPreviewGridProps {
 const PhotoPreviewGrid: React.FC<PhotoPreviewGridProps> = ({ 
   label, 
   photos = [], 
-  className = '' 
 }) => {
-  if (photos.length === 0) {
-    return null
-  }
 
   return (
-    <div className={`mb-4 ${className}`}>
+    <div className="mb-4">
       <span className="font-bold text-gray-700 block mb-2">{label}:</span>
       <div className="grid grid-cols-2 gap-2">
-        {photos.map((photo, index) => (
-          <PhotoPreview
-            key={index}
-            src={photo}
-            alt={`Photo ${index + 1}`}
+        <PhotoPreview
+            key="photo-1"
+            src={photos[0]}
+            alt="Photo 1"
             className="bg-red-200"
-          />
-        ))}
+        />
+        <PhotoPreview
+            key="photo-2"
+            src={photos[1]}
+            alt="Photo 2"
+            className="bg-green-200"
+        />
       </div>
     </div>
   )
