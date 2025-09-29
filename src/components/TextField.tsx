@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react"
+import React, { forwardRef } from "react"
+import { FIELD_KINDS } from "../types/fieldTypes"
 
 export interface TextFieldProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'name' | 'required'> {
   label: string
@@ -7,36 +8,20 @@ export interface TextFieldProps extends Omit<React.InputHTMLAttributes<HTMLInput
   placeholder?: string
   required?: boolean
   error?: string
-  minLength?: number
-  maxLength?: number
-  noNumbers?: boolean
-  onValidationChange?: (fieldName: string, isValid: boolean, hasError: boolean) => void
 }
 
-const TextField: React.FC<TextFieldProps> = ({
+const TextField = forwardRef<HTMLInputElement, TextFieldProps>(({
   label,
   name,
-  type = "text",
+  type = FIELD_KINDS.TEXT,
   placeholder,
-  required,
+  required = false,
   error,
-  minLength,
-  maxLength,
-  noNumbers,
-  onValidationChange,
   ...props
-}) => {
-  const [localError, setLocalError] = useState<string | undefined>(undefined)
-  const fieldError = localError || error
-  const shouldShowError = !!fieldError
-  const baseStyles = "w-full border border-grey-500 rounded-md px-2 py-1"
+}, ref) => {
+  const shouldShowError = !!error
+  const baseStyles = "w-full border border-gray-500 [border-style:solid] rounded-md px-2 py-1"
   const inputStyles = shouldShowError ? `${baseStyles} border-red-500` : baseStyles
-  
-  useEffect(() => {
-    const hasError = !!fieldError
-    const isValid = Boolean(!hasError && (!required || false))
-    onValidationChange?.(name, isValid, hasError)
-  }, [name, required, onValidationChange, fieldError])
 
   return (
     <div className="mb-3">
@@ -45,34 +30,19 @@ const TextField: React.FC<TextFieldProps> = ({
         {required && <span className="text-red-500 ml-1">*</span>}
       </label>
       <input
+        ref={ref}
         type={type}
         placeholder={placeholder}
         className={inputStyles}
         aria-invalid={!!shouldShowError}
-        onBlur={async (e) => {
-          const value = e.target.value
-          let errorMessage: string | undefined = undefined
-          if (required && (!value || value.trim() === '')) {
-            errorMessage = `${label} is required`
-          } else if (minLength && value && value.length < minLength) {
-            errorMessage = `${label} must be at least ${minLength} characters`
-          } else if (maxLength && value && value.length > maxLength) {
-            errorMessage = `${label} must be at most ${maxLength} characters`
-          } else if (noNumbers && value && /\d/.test(value)) {
-            errorMessage = `${label} cannot contain numbers`
-          }
-          setLocalError(errorMessage)
-          const hasError = !!errorMessage
-          const isValid = Boolean(!hasError && (!required || (value && value.trim() !== '')))
-          onValidationChange?.(name, isValid, hasError)
-          props.onBlur?.(e)
-        }}
         {...props}
       />
-      {shouldShowError && <p className="mt-1 text-xs text-red-600">{fieldError}</p>}
+      {shouldShowError && <p className="mt-1 text-xs text-red-600">{error}</p>}
     </div>
   )
-}
+})
+
+TextField.displayName = 'TextField'
 
 export default TextField
 

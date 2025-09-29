@@ -1,6 +1,1 @@
-import "./rc-text-field"
-import "./rc-text-area"
-import "./rc-select-list"
-import "./rc-input-submit"
-import "./rc-photo-uploader"
-import "./rc-form-step"
+import "./custom-form-component"

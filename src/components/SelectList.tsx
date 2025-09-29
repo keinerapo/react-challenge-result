@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from "react"
+import React, { forwardRef } from "react"
 
 export interface SelectListProps extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'name' | 'required'> {
   label: string
@@ -6,29 +6,19 @@ export interface SelectListProps extends Omit<React.SelectHTMLAttributes<HTMLSel
   options?: string[]
   required?: boolean
   error?: string
-  onValidationChange?: (fieldName: string, isValid: boolean, hasError: boolean) => void
 }
 
-const SelectList: FC<SelectListProps> = ({
+const SelectList = forwardRef<HTMLSelectElement, SelectListProps>(({
   label,
   name,
   options = [],
-  required,
+  required = false,
   error,
-  onValidationChange,
   ...props
-}) => {
-  const [localError, setLocalError] = useState<string | undefined>(undefined)
-  const fieldError = localError || error
-  const shouldShowError = !!fieldError
-  const baseStyles = "w-full border-2 border-grey-500 rounded-md px-2 py-1"
+}, ref) => {
+  const shouldShowError = !!error
+  const baseStyles = "w-full border border-gray-500 [border-style:solid] rounded-md px-2 py-1"
   const inputStyles = shouldShowError ? `${baseStyles} border-red-500` : baseStyles
-  
-  useEffect(() => {
-    const hasError = !!fieldError
-    const isValid = Boolean(!hasError && (!required || false))
-    onValidationChange?.(name, isValid, hasError)
-  }, [name, required, onValidationChange, fieldError])
 
   return (
     <div className="mb-3">
@@ -36,34 +26,25 @@ const SelectList: FC<SelectListProps> = ({
         {label}
         {required && <span className="text-red-500 ml-1">*</span>}
       </label>
-      <select
+            <select
+        ref={ref}
         className={inputStyles}
         aria-invalid={!!shouldShowError}
-        onBlur={(e) => {
-          const value = e.target.value
-          let errorMessage: string | undefined = undefined
-          if (required && (!value || value.trim() === '')) {
-            errorMessage = `${label} is required`
-          }
-          setLocalError(errorMessage)
-          const hasError = !!errorMessage
-          const isValid = Boolean(!hasError && (!required || (value && value.trim() !== '')))
-          onValidationChange?.(name, isValid, hasError)
-          props.onBlur?.(e)
-        }}
         {...props}
       >
-        <option value="">Select...</option>
-        {options.map((opt) => (
-          <option key={opt} value={opt}>
-            {opt}
+        <option value="">{`Select ${label}`}</option>
+        {options.map((option, index) => (
+          <option key={index} value={option}>
+            {option}
           </option>
         ))}
       </select>
-      {shouldShowError && <p className="mt-1 text-xs text-red-600">{fieldError}</p>}
+      {shouldShowError && <p className="mt-1 text-xs text-red-600">{error}</p>}
     </div>
   )
-}
+})
+
+SelectList.displayName = 'SelectList'
 
 export default SelectList
 
